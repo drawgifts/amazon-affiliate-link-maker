@@ -747,10 +747,10 @@
         <div>
           <div class="eyebrow">Tag prefilled: dahinwal90-21</div>
           <h1>Amazon Affiliate Link Maker</h1>
-          <p class="hero-copy">Clean product links, discount-style cards, top-rated labels, and Blogger-ready HTML in one fast tool. Paste a product URL, generate, copy, publish.</p>
+          <p class="hero-copy">Clean affiliate links, discount-style cards, top-rated labels, and Blogger-ready HTML in one fast tool. Paste any Amazon product or short URL, generate, copy, publish.</p>
           <div class="hero-stats" aria-label="Highlights">
             <span class="stat-pill">Clean affiliate URL</span>
-            <span class="stat-pill">ASIN auto-detect</span>
+            <span class="stat-pill">Short URL support</span>
             <span class="stat-pill">Blogger embed</span>
           </div>
           <div class="promo-deals" aria-label="Affiliate deal banners">
@@ -823,7 +823,7 @@
           <form class="form" id="linkForm">
             <div class="field">
               <label for="productUrl">Amazon Product URL or ASIN</label>
-              <textarea id="productUrl" placeholder="https://www.amazon.in/dp/B0XXXXXXX or B0XXXXXXX" required></textarea>
+              <textarea id="productUrl" placeholder="https://amzn.in/d/07KLc3gY or https://www.amazon.in/dp/B0XXXXXXX" required></textarea>
             </div>
 
             <div class="split">
@@ -883,14 +883,6 @@
             </div>
           </section>
 
-          <section class="result-box">
-            <h3>Detected ASIN</h3>
-            <div class="output-line">
-              <div class="output" id="asinOutput">Waiting for product URL.</div>
-              <button class="copy-btn" type="button" data-copy="asinOutput" title="Copy ASIN">Copy</button>
-            </div>
-          </section>
-
           <section class="result-box" id="preview">
             <h3>Ad Preview</h3>
             <div class="ad-preview">
@@ -943,7 +935,6 @@
     const ratingInput = document.getElementById("rating");
     const priceInput = document.getElementById("price");
     const affiliateUrl = document.getElementById("affiliateUrl");
-    const asinOutput = document.getElementById("asinOutput");
     const bloggerCode = document.getElementById("bloggerCode");
     const previewLink = document.getElementById("previewLink");
     const previewTitle = document.getElementById("previewTitle");
@@ -1017,16 +1008,16 @@
       return marketplaceInput.value;
     }
 
-    function getAmazonShortUrl(rawValue) {
+    function getTaggedAmazonUrl(rawValue, tag) {
       try {
         const parsed = new URL(rawValue.trim());
         const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
-        const isShortHost = host === "amzn.in" || host === "amzn.to";
-        const hasShortPath = /^\/d\/[A-Z0-9]+\/?$/i.test(parsed.pathname);
 
-        if (!isShortHost || !hasShortPath) return "";
+        if (!amazonDomains.some((domain) => host === domain || host.endsWith("." + domain))) {
+          return "";
+        }
 
-        parsed.searchParams.set("tag", affiliateTagInput.value.trim() || "dahinwal90-21");
+        parsed.searchParams.set("tag", tag.trim() || "dahinwal90-21");
         parsed.hash = "";
         return parsed.toString();
       } catch (error) {
@@ -1037,21 +1028,20 @@
     function makeAffiliateLink(rawValue, tag) {
       const asin = normalizeAsin(rawValue);
       if (!asin) {
-        const shortUrl = getAmazonShortUrl(rawValue);
-        if (shortUrl) {
+        const taggedUrl = getTaggedAmazonUrl(rawValue, tag);
+        if (taggedUrl) {
           return {
-            asin: "Short URL (ASIN hidden)",
-            url: shortUrl,
-            note: "Short URL me ASIN hidden hota hai. Clean ASIN link ke liye expanded Amazon URL paste karein."
+            url: taggedUrl,
+            note: "Amazon URL me affiliate tag add ho gaya."
           };
         }
-        throw new Error("ASIN detect nahi hua. Product URL, Amazon short URL, ya 10-character ASIN paste karein.");
+        throw new Error("Valid Amazon product URL, short URL, ya 10-character ASIN paste karein.");
       }
 
       const origin = getMarketplaceFromInput(rawValue);
       const url = new URL("/dp/" + asin, origin);
       url.searchParams.set("tag", tag.trim());
-      return { asin, url: url.toString(), note: "" };
+      return { url: url.toString(), note: "" };
     }
 
     function buildTaggedUrl(path, params = {}) {
@@ -1128,7 +1118,6 @@
       try {
         const result = makeAffiliateLink(rawValue, tag);
         const data = {
-          asin: result.asin,
           url: result.url,
           title,
           discount,
@@ -1137,13 +1126,11 @@
         };
 
         affiliateUrl.textContent = data.url;
-        asinOutput.textContent = data.asin;
         bloggerCode.value = makeBloggerCard(data);
         updatePreview(data);
         showToast(result.note || "Affiliate link ready.");
       } catch (error) {
         affiliateUrl.textContent = "Could not generate link.";
-        asinOutput.textContent = error.message;
         bloggerCode.value = "";
         showToast(error.message);
       }
@@ -1163,7 +1150,6 @@
       ratingInput.value = "4.7 Rated";
       priceInput.value = "Check Price";
       affiliateUrl.textContent = "Generated link will appear here.";
-      asinOutput.textContent = "Waiting for product URL.";
       bloggerCode.value = "Generated Blogger HTML will appear here.";
       updatePreview({
         url: "#",

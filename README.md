@@ -6,7 +6,8 @@ Supports:
 
 - Long Amazon product URLs, for example `/dp/ASIN`
 - Direct 10-character ASIN input
-- Amazon short URLs like `https://amzn.in/d/...` by adding the affiliate tag to the short URL
+- Amazon short URLs like `https://amzn.in/d/...` by adding the affiliate tag to the URL
+- Any valid Amazon URL by adding the affiliate tag directly when ASIN is not visible
 - Affiliate-tagged banner links for Today Deals, Black Friday, Big Discount, and Top Rated searches
 
 ## Files
