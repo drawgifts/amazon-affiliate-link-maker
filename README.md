@@ -2,6 +2,13 @@
 
 Static GitHub Pages website for creating clean Amazon affiliate links with the prefilled tag `dahinwal90-21`.
 
+Supports:
+
+- Long Amazon product URLs, for example `/dp/ASIN`
+- Direct 10-character ASIN input
+- Amazon short URLs like `https://amzn.in/d/...` by adding the affiliate tag to the short URL
+- Affiliate-tagged banner links for Today Deals, Black Friday, Big Discount, and Top Rated searches
+
 ## Files
 
 - `index.html`

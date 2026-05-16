@@ -175,6 +175,95 @@
       font-weight: 800;
     }
 
+    .promo-deals {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 28px;
+      max-width: 940px;
+    }
+
+    .promo-card {
+      position: relative;
+      min-height: 116px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid rgba(221, 229, 237, 0.88);
+      border-radius: 8px;
+      color: #17222d;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 10px 28px rgba(17, 28, 39, 0.08);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .promo-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 138, 31, 0.55);
+      box-shadow: 0 16px 34px rgba(17, 28, 39, 0.13);
+    }
+
+    .promo-card::after {
+      content: "";
+      position: absolute;
+      right: -22px;
+      bottom: -28px;
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      opacity: 0.18;
+      background: currentColor;
+    }
+
+    .promo-card strong,
+    .promo-card span,
+    .promo-card small {
+      position: relative;
+      z-index: 1;
+    }
+
+    .promo-card strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1.15;
+    }
+
+    .promo-card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .promo-card small {
+      width: fit-content;
+      border-radius: 8px;
+      padding: 5px 7px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .promo-card.today {
+      color: var(--orange-dark);
+    }
+
+    .promo-card.black {
+      color: #111827;
+      background: linear-gradient(135deg, #ffffff, #eef3f7);
+    }
+
+    .promo-card.discount {
+      color: var(--red);
+    }
+
+    .promo-card.top {
+      color: var(--teal);
+    }
+
     .hero-panel {
       align-self: end;
       padding: 22px;
@@ -532,6 +621,10 @@
         grid-template-columns: 1fr;
       }
 
+      .promo-deals {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .hero-inner {
         min-height: auto;
       }
@@ -570,6 +663,10 @@
 
       .split,
       .triplet {
+        grid-template-columns: 1fr;
+      }
+
+      .promo-deals {
         grid-template-columns: 1fr;
       }
 
@@ -615,6 +712,28 @@
             <span class="stat-pill">Clean affiliate URL</span>
             <span class="stat-pill">ASIN auto-detect</span>
             <span class="stat-pill">Blogger embed</span>
+          </div>
+          <div class="promo-deals" aria-label="Affiliate deal banners">
+            <a class="promo-card today" data-deal-link="today" href="#" target="_blank" rel="nofollow sponsored noopener">
+              <small>Today</small>
+              <strong>Today Deals</strong>
+              <span>Fresh offers with your tag</span>
+            </a>
+            <a class="promo-card black" data-deal-link="blackFriday" href="#" target="_blank" rel="nofollow sponsored noopener">
+              <small>Sale</small>
+              <strong>Black Friday</strong>
+              <span>High-intent deal search</span>
+            </a>
+            <a class="promo-card discount" data-deal-link="discount" href="#" target="_blank" rel="nofollow sponsored noopener">
+              <small>Save</small>
+              <strong>Big Discount</strong>
+              <span>Discount product ideas</span>
+            </a>
+            <a class="promo-card top" data-deal-link="topRated" href="#" target="_blank" rel="nofollow sponsored noopener">
+              <small>Top</small>
+              <strong>Top Rated</strong>
+              <span>Popular buying picks</span>
+            </a>
           </div>
         </div>
         <aside class="hero-panel" aria-label="Deal examples">
@@ -788,6 +907,7 @@
     const previewRating = document.getElementById("previewRating");
     const previewPrice = document.getElementById("previewPrice");
     const toast = document.getElementById("toast");
+    const dealLinks = document.querySelectorAll("[data-deal-link]");
 
     const amazonDomains = [
       "amazon.in",
@@ -853,16 +973,61 @@
       return marketplaceInput.value;
     }
 
+    function getAmazonShortUrl(rawValue) {
+      try {
+        const parsed = new URL(rawValue.trim());
+        const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+        const isShortHost = host === "amzn.in" || host === "amzn.to";
+        const hasShortPath = /^\/d\/[A-Z0-9]+\/?$/i.test(parsed.pathname);
+
+        if (!isShortHost || !hasShortPath) return "";
+
+        parsed.searchParams.set("tag", affiliateTagInput.value.trim() || "dahinwal90-21");
+        parsed.hash = "";
+        return parsed.toString();
+      } catch (error) {
+        return "";
+      }
+    }
+
     function makeAffiliateLink(rawValue, tag) {
       const asin = normalizeAsin(rawValue);
       if (!asin) {
-        throw new Error("ASIN detect nahi hua. Product URL ya 10-character ASIN paste karein.");
+        const shortUrl = getAmazonShortUrl(rawValue);
+        if (shortUrl) {
+          return {
+            asin: "Short URL (ASIN hidden)",
+            url: shortUrl,
+            note: "Short URL me ASIN hidden hota hai. Clean ASIN link ke liye expanded Amazon URL paste karein."
+          };
+        }
+        throw new Error("ASIN detect nahi hua. Product URL, Amazon short URL, ya 10-character ASIN paste karein.");
       }
 
       const origin = getMarketplaceFromInput(rawValue);
       const url = new URL("/dp/" + asin, origin);
       url.searchParams.set("tag", tag.trim());
-      return { asin, url: url.toString() };
+      return { asin, url: url.toString(), note: "" };
+    }
+
+    function buildTaggedUrl(path, params = {}) {
+      const url = new URL(path, marketplaceInput.value || "https://www.amazon.in");
+      Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+      url.searchParams.set("tag", affiliateTagInput.value.trim() || "dahinwal90-21");
+      return url.toString();
+    }
+
+    function updateDealLinks() {
+      const urls = {
+        today: buildTaggedUrl("/deals"),
+        blackFriday: buildTaggedUrl("/s", { k: "black friday deals" }),
+        discount: buildTaggedUrl("/s", { k: "today discount deals" }),
+        topRated: buildTaggedUrl("/s", { k: "top rated deals" })
+      };
+
+      dealLinks.forEach((link) => {
+        link.href = urls[link.dataset.dealLink] || urls.today;
+      });
     }
 
     function makeBloggerCard(data) {
@@ -931,7 +1096,7 @@
         asinOutput.textContent = data.asin;
         bloggerCode.value = makeBloggerCard(data);
         updatePreview(data);
-        showToast("Affiliate link ready.");
+        showToast(result.note || "Affiliate link ready.");
       } catch (error) {
         affiliateUrl.textContent = "Could not generate link.";
         asinOutput.textContent = error.message;
@@ -983,6 +1148,10 @@
         }
       });
     });
+
+    affiliateTagInput.addEventListener("input", updateDealLinks);
+    marketplaceInput.addEventListener("change", updateDealLinks);
+    updateDealLinks();
   </script>
 </body>
 </html>
