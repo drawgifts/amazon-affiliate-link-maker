@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amazon Affiliate Link Maker</title>
+  <meta name="description" content="Create clean Amazon affiliate links, product ad cards, and Blogger embed code with your affiliate tag.">
+  <style>
+    :root {
+      --ink: #16202a;
+      --muted: #66727f;
+      --paper: #ffffff;
+      --wash: #f5f7fa;
+      --line: #dde5ed;
+      --orange: #ff8a1f;
+      --orange-dark: #c95d00;
+      --teal: #0f9f93;
+      --blue: #315c9b;
+      --red: #df3d32;
+      --shadow: 0 20px 55px rgba(17, 28, 39, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--wash);
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-shell {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(221, 229, 237, 0.88);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), var(--teal));
+      box-shadow: 0 10px 24px rgba(15, 159, 147, 0.25);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-actions a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hero {
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 45%, rgba(255, 255, 255, 0.35) 100%),
+        url("assets/hero-deals.png") center right / cover no-repeat;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-inner {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.68fr);
+      align-items: center;
+      gap: 42px;
+      padding: 62px 0 44px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--orange-dark);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 2px;
+      background: var(--orange);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 680px;
+      font-size: clamp(40px, 6vw, 76px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 610px;
+      margin: 22px 0 0;
+      color: #44515d;
+      font-size: 18px;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #33404c;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .hero-panel {
+      align-self: end;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .deal-mini {
+      display: grid;
+      gap: 14px;
+    }
+
+    .deal-row {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .deal-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #fff2df, #dff8f5);
+      display: grid;
+      place-items: center;
+      color: var(--blue);
+    }
+
+    .deal-row strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .deal-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tag-badge {
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #fff0ed;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    main {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 58px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.65fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 10px 28px rgba(17, 28, 39, 0.07);
+    }
+
+    .panel-head {
+      padding: 22px 22px 0;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .panel-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      color: #2f3b46;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #cfd9e3;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    textarea {
+      min-height: 98px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(15, 159, 147, 0.12);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .triplet {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 4px;
+    }
+
+    .btn {
+      min-height: 46px;
+      border: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 900;
+      text-decoration: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), #f05a28);
+      box-shadow: 0 12px 24px rgba(240, 90, 40, 0.26);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: #edf3f7;
+    }
+
+    .btn-ghost {
+      color: var(--blue);
+      background: transparent;
+      border: 1px solid var(--line);
+    }
+
+    .result-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .result-box {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .result-box h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .output-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .output {
+      min-height: 42px;
+      overflow-wrap: anywhere;
+      border: 1px solid #dbe4ed;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #24313d;
+      padding: 10px 11px;
+      font-size: 13px;
+    }
+
+    .copy-btn {
+      min-width: 42px;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--blue);
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .ad-preview {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #ffffff, #f8fbfd);
+    }
+
+    .preview-media {
+      position: relative;
+      min-height: 160px;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255, 138, 31, 0.18), rgba(15, 159, 147, 0.16)),
+        url("assets/hero-deals.png") center / cover no-repeat;
+    }
+
+    .discount-chip,
+    .rating-chip {
+      position: absolute;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 900;
+      font-size: 13px;
+      box-shadow: 0 10px 22px rgba(17, 28, 39, 0.18);
+    }
+
+    .discount-chip {
+      top: 12px;
+      left: 12px;
+      padding: 8px 10px;
+      background: var(--red);
+    }
+
+    .rating-chip {
+      right: 12px;
+      bottom: 12px;
+      padding: 8px 10px;
+      background: var(--teal);
+    }
+
+    .ad-preview h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.22;
+    }
+
+    .price-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .price {
+      color: var(--orange-dark);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .mrp {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      max-width: min(360px, calc(100% - 36px));
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #13202a;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .footer-inner {
+      width: min(1160px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner,
+      .tool-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-inner {
+        min-height: auto;
+      }
+
+      .hero-panel {
+        align-self: auto;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar-inner {
+        min-height: 62px;
+      }
+
+      .nav-actions {
+        display: none;
+      }
+
+      .hero {
+        background-position: center;
+      }
+
+      .hero-inner {
+        width: min(100% - 24px, 1160px);
+        padding: 42px 0 28px;
+      }
+
+      .hero-copy {
+        font-size: 16px;
+      }
+
+      main {
+        width: min(100% - 24px, 1160px);
+        padding-top: 28px;
+      }
+
+      .split,
+      .triplet {
+        grid-template-columns: 1fr;
+      }
+
+      .output-line {
+        grid-template-columns: 1fr;
+      }
+
+      .copy-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7"></path>
+              <path d="M4 12h16"></path>
+              <path d="M7 12V8a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </span>
+          <span>Affiliate Link Maker</span>
+        </div>
+        <nav class="nav-actions" aria-label="Primary">
+          <a href="#tool">Tool</a>
+          <a href="#preview">Preview</a>
+          <a href="#blogger">Blogger Code</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Tag prefilled: dahinwal90-21</div>
+          <h1>Amazon Affiliate Link Maker</h1>
+          <p class="hero-copy">Clean product links, discount-style cards, top-rated labels, and Blogger-ready HTML in one fast tool. Paste a product URL, generate, copy, publish.</p>
+          <div class="hero-stats" aria-label="Highlights">
+            <span class="stat-pill">Clean affiliate URL</span>
+            <span class="stat-pill">ASIN auto-detect</span>
+            <span class="stat-pill">Blogger embed</span>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Deal examples">
+          <div class="deal-mini">
+            <div class="deal-row">
+              <div class="deal-thumb" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2h12l2 7H4l2-7Z"></path>
+                  <path d="M5 9v11h14V9"></path>
+                  <path d="M9 13h6"></path>
+                </svg>
+              </div>
+              <div>
+                <strong>Product Deal Card</strong>
+                <span>Discount, price and rating preview</span>
+              </div>
+              <span class="tag-badge">-45%</span>
+            </div>
+            <div class="deal-row">
+              <div class="deal-thumb" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z"></path>
+                </svg>
+              </div>
+              <div>
+                <strong>Top Rated Format</strong>
+                <span>Use it inside buying guides</span>
+              </div>
+              <span class="tag-badge">4.7</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <main>
+      <div class="tool-grid" id="tool">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Create Your Link</h2>
+            <p>Product URL ya ASIN paste karo. Affiliate tag already set hai, aap chahe to edit bhi kar sakte ho.</p>
+          </div>
+          <form class="form" id="linkForm">
+            <div class="field">
+              <label for="productUrl">Amazon Product URL or ASIN</label>
+              <textarea id="productUrl" placeholder="https://www.amazon.in/dp/B0XXXXXXX or B0XXXXXXX" required></textarea>
+            </div>
+
+            <div class="split">
+              <div class="field">
+                <label for="affiliateTag">Affiliate Tag</label>
+                <input id="affiliateTag" value="dahinwal90-21" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="marketplace">Default Marketplace</label>
+                <select id="marketplace">
+                  <option value="https://www.amazon.in">Amazon India</option>
+                  <option value="https://www.amazon.com">Amazon US</option>
+                  <option value="https://www.amazon.co.uk">Amazon UK</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="title">Product Title</label>
+              <input id="title" value="Best Deal on Amazon" placeholder="Product title for ad card">
+            </div>
+
+            <div class="triplet">
+              <div class="field">
+                <label for="discount">Discount</label>
+                <input id="discount" value="45% OFF" placeholder="45% OFF">
+              </div>
+              <div class="field">
+                <label for="rating">Rating</label>
+                <input id="rating" value="4.7 Rated" placeholder="4.7 Rated">
+              </div>
+              <div class="field">
+                <label for="price">Price</label>
+                <input id="price" value="Check Price" placeholder="Rs. 999">
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" type="submit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Generate Link
+              </button>
+              <button class="btn btn-ghost" id="resetBtn" type="button">Reset</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="result-stack">
+          <section class="result-box">
+            <h3>Affiliate URL</h3>
+            <div class="output-line">
+              <div class="output" id="affiliateUrl">Generated link will appear here.</div>
+              <button class="copy-btn" type="button" data-copy="affiliateUrl" title="Copy affiliate URL">Copy</button>
+            </div>
+          </section>
+
+          <section class="result-box">
+            <h3>Detected ASIN</h3>
+            <div class="output-line">
+              <div class="output" id="asinOutput">Waiting for product URL.</div>
+              <button class="copy-btn" type="button" data-copy="asinOutput" title="Copy ASIN">Copy</button>
+            </div>
+          </section>
+
+          <section class="result-box" id="preview">
+            <h3>Ad Preview</h3>
+            <div class="ad-preview">
+              <div class="preview-media">
+                <span class="discount-chip" id="previewDiscount">45% OFF</span>
+                <span class="rating-chip" id="previewRating">4.7 Rated</span>
+              </div>
+              <h3 id="previewTitle">Best Deal on Amazon</h3>
+              <div class="price-line">
+                <span class="price" id="previewPrice">Check Price</span>
+                <span class="mrp">Limited deal</span>
+              </div>
+              <a class="btn btn-primary" id="previewLink" href="#" target="_blank" rel="nofollow sponsored noopener">View Deal</a>
+              <p class="note">Affiliate disclosure: As an affiliate, we may earn from qualifying purchases.</p>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="panel" id="blogger" style="margin-top:22px;">
+        <div class="panel-head">
+          <h2>Blogger Embed Code</h2>
+          <p>Generate ke baad ye HTML Blogger ke HTML view me paste kar sakte ho.</p>
+        </div>
+        <div class="form">
+          <div class="output-line">
+            <textarea class="output" id="bloggerCode" readonly>Generated Blogger HTML will appear here.</textarea>
+            <button class="copy-btn" type="button" data-copy="bloggerCode" title="Copy Blogger code">Copy</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        This tool creates clean affiliate links. Product prices, ratings, and availability should be verified on the retailer site before publishing.
+      </div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const form = document.getElementById("linkForm");
+    const productUrlInput = document.getElementById("productUrl");
+    const affiliateTagInput = document.getElementById("affiliateTag");
+    const marketplaceInput = document.getElementById("marketplace");
+    const titleInput = document.getElementById("title");
+    const discountInput = document.getElementById("discount");
+    const ratingInput = document.getElementById("rating");
+    const priceInput = document.getElementById("price");
+    const affiliateUrl = document.getElementById("affiliateUrl");
+    const asinOutput = document.getElementById("asinOutput");
+    const bloggerCode = document.getElementById("bloggerCode");
+    const previewLink = document.getElementById("previewLink");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewDiscount = document.getElementById("previewDiscount");
+    const previewRating = document.getElementById("previewRating");
+    const previewPrice = document.getElementById("previewPrice");
+    const toast = document.getElementById("toast");
+
+    const amazonDomains = [
+      "amazon.in",
+      "amazon.com",
+      "amazon.co.uk",
+      "amazon.ca",
+      "amazon.com.au",
+      "amazon.de",
+      "amazon.fr",
+      "amazon.it",
+      "amazon.es",
+      "amzn.in",
+      "amzn.to"
+    ];
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function normalizeAsin(value) {
+      const trimmed = value.trim();
+      const direct = trimmed.match(/^[A-Z0-9]{10}$/i);
+      if (direct) return direct[0].toUpperCase();
+
+      const patterns = [
+        /\/dp\/([A-Z0-9]{10})(?:[/?]|$)/i,
+        /\/gp\/product\/([A-Z0-9]{10})(?:[/?]|$)/i,
+        /\/product\/([A-Z0-9]{10})(?:[/?]|$)/i,
+        /\/ASIN\/([A-Z0-9]{10})(?:[/?]|$)/i,
+        /[?&]asin=([A-Z0-9]{10})(?:&|$)/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = trimmed.match(pattern);
+        if (match) return match[1].toUpperCase();
+      }
+
+      const fallback = trimmed.match(/([A-Z0-9]{10})/i);
+      return fallback ? fallback[1].toUpperCase() : "";
+    }
+
+    function getMarketplaceFromInput(rawValue) {
+      try {
+        const parsed = new URL(rawValue);
+        const host = parsed.hostname.replace(/^www\./, "");
+        if (amazonDomains.some((domain) => host === domain || host.endsWith("." + domain))) {
+          return parsed.origin;
+        }
+      } catch (error) {
+        return marketplaceInput.value;
+      }
+      return marketplaceInput.value;
+    }
+
+    function makeAffiliateLink(rawValue, tag) {
+      const asin = normalizeAsin(rawValue);
+      if (!asin) {
+        throw new Error("ASIN detect nahi hua. Product URL ya 10-character ASIN paste karein.");
+      }
+
+      const origin = getMarketplaceFromInput(rawValue);
+      const url = new URL("/dp/" + asin, origin);
+      url.searchParams.set("tag", tag.trim());
+      return { asin, url: url.toString() };
+    }
+
+    function makeBloggerCard(data) {
+      const safeTitle = escapeHtml(data.title);
+      const safePrice = escapeHtml(data.price);
+      const safeDiscount = escapeHtml(data.discount);
+      const safeRating = escapeHtml(data.rating);
+      const safeUrl = escapeHtml(data.url);
+
+      return `<div style="max-width:560px;border:1px solid #dde5ed;border-radius:8px;background:#fff;overflow:hidden;font-family:Arial,sans-serif;color:#16202a;box-shadow:0 10px 28px rgba(17,28,39,.10);">
+  <div style="background:#f5f7fa;padding:14px 16px;display:flex;gap:10px;justify-content:space-between;align-items:center;">
+    <strong style="font-size:15px;">${safeTitle}</strong>
+    <span style="background:#df3d32;color:#fff;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;">${safeDiscount}</span>
+  </div>
+  <div style="padding:16px;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="color:#c95d00;font-size:24px;font-weight:800;">${safePrice}</span>
+      <span style="background:#e9f8f6;color:#0f766e;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;">${safeRating}</span>
+    </div>
+    <a href="${safeUrl}" target="_blank" rel="nofollow sponsored noopener" style="display:inline-block;background:#ff8a1f;color:#fff;text-decoration:none;border-radius:8px;padding:11px 16px;font-weight:800;">View Deal</a>
+    <p style="color:#66727f;font-size:12px;margin:12px 0 0;">Affiliate disclosure: We may earn from qualifying purchases.</p>
+  </div>
+</div>`;
+    }
+
+    function updatePreview(data) {
+      previewTitle.textContent = data.title;
+      previewDiscount.textContent = data.discount;
+      previewRating.textContent = data.rating;
+      previewPrice.textContent = data.price;
+      previewLink.href = data.url;
+    }
+
+    function generate() {
+      const rawValue = productUrlInput.value.trim();
+      const tag = affiliateTagInput.value.trim() || "dahinwal90-21";
+      const title = titleInput.value.trim() || "Best Deal on Amazon";
+      const discount = discountInput.value.trim() || "Deal";
+      const rating = ratingInput.value.trim() || "Top Rated";
+      const price = priceInput.value.trim() || "Check Price";
+
+      if (!rawValue) {
+        showToast("Product URL ya ASIN paste karein.");
+        productUrlInput.focus();
+        return;
+      }
+
+      if (!tag) {
+        showToast("Affiliate tag required hai.");
+        affiliateTagInput.focus();
+        return;
+      }
+
+      try {
+        const result = makeAffiliateLink(rawValue, tag);
+        const data = {
+          asin: result.asin,
+          url: result.url,
+          title,
+          discount,
+          rating,
+          price
+        };
+
+        affiliateUrl.textContent = data.url;
+        asinOutput.textContent = data.asin;
+        bloggerCode.value = makeBloggerCard(data);
+        updatePreview(data);
+        showToast("Affiliate link ready.");
+      } catch (error) {
+        affiliateUrl.textContent = "Could not generate link.";
+        asinOutput.textContent = error.message;
+        bloggerCode.value = "";
+        showToast(error.message);
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      generate();
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      productUrlInput.value = "";
+      affiliateTagInput.value = "dahinwal90-21";
+      marketplaceInput.value = "https://www.amazon.in";
+      titleInput.value = "Best Deal on Amazon";
+      discountInput.value = "45% OFF";
+      ratingInput.value = "4.7 Rated";
+      priceInput.value = "Check Price";
+      affiliateUrl.textContent = "Generated link will appear here.";
+      asinOutput.textContent = "Waiting for product URL.";
+      bloggerCode.value = "Generated Blogger HTML will appear here.";
+      updatePreview({
+        url: "#",
+        title: "Best Deal on Amazon",
+        discount: "45% OFF",
+        rating: "4.7 Rated",
+        price: "Check Price"
+      });
+      showToast("Form reset.");
+    });
+
+    document.querySelectorAll("[data-copy]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const target = document.getElementById(button.dataset.copy);
+        const value = target.value || target.textContent;
+        if (!value || value.includes("appear here") || value.includes("Waiting")) {
+          showToast("Copy karne ke liye pehle link generate karein.");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(value.trim());
+          showToast("Copied.");
+        } catch (error) {
+          showToast("Clipboard blocked. Text manually select karke copy karein.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
