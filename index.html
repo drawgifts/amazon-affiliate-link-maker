@@ -185,8 +185,8 @@
 
     .promo-card {
       position: relative;
-      min-height: 116px;
-      padding: 14px;
+      min-height: 142px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -218,9 +218,18 @@
       background: currentColor;
     }
 
+    .promo-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.72;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.44));
+    }
+
     .promo-card strong,
     .promo-card span,
-    .promo-card small {
+    .promo-card small,
+    .promo-action {
       position: relative;
       z-index: 1;
     }
@@ -247,21 +256,52 @@
       font-weight: 900;
     }
 
+    .promo-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 30px;
+      margin-top: 10px;
+      border-radius: 8px;
+      padding: 6px 9px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
     .promo-card.today {
       color: var(--orange-dark);
+      background:
+        radial-gradient(circle at 80% 20%, rgba(255, 138, 31, 0.28), transparent 42%),
+        linear-gradient(135deg, #fff8ef, #ffffff);
     }
 
     .promo-card.black {
-      color: #111827;
-      background: linear-gradient(135deg, #ffffff, #eef3f7);
+      color: #0f1720;
+      background:
+        radial-gradient(circle at 84% 18%, rgba(255, 138, 31, 0.32), transparent 40%),
+        linear-gradient(135deg, #111827, #ffffff 68%);
+    }
+
+    .promo-card.black strong,
+    .promo-card.black span {
+      color: #101923;
     }
 
     .promo-card.discount {
       color: var(--red);
+      background:
+        radial-gradient(circle at 80% 20%, rgba(223, 61, 50, 0.26), transparent 42%),
+        linear-gradient(135deg, #fff3f0, #ffffff);
     }
 
     .promo-card.top {
       color: var(--teal);
+      background:
+        radial-gradient(circle at 80% 20%, rgba(15, 159, 147, 0.26), transparent 42%),
+        linear-gradient(135deg, #edfdfa, #ffffff);
     }
 
     .hero-panel {
@@ -718,21 +758,25 @@
               <small>Today</small>
               <strong>Today Deals</strong>
               <span>Fresh offers with your tag</span>
+              <b class="promo-action">Shop Now</b>
             </a>
             <a class="promo-card black" data-deal-link="blackFriday" href="#" target="_blank" rel="nofollow sponsored noopener">
               <small>Sale</small>
               <strong>Black Friday</strong>
-              <span>High-intent deal search</span>
+              <span>Black Friday deal results</span>
+              <b class="promo-action">View Deals</b>
             </a>
             <a class="promo-card discount" data-deal-link="discount" href="#" target="_blank" rel="nofollow sponsored noopener">
               <small>Save</small>
               <strong>Big Discount</strong>
-              <span>Discount product ideas</span>
+              <span>Heavy discount deal results</span>
+              <b class="promo-action">Find Offers</b>
             </a>
             <a class="promo-card top" data-deal-link="topRated" href="#" target="_blank" rel="nofollow sponsored noopener">
               <small>Top</small>
               <strong>Top Rated</strong>
-              <span>Popular buying picks</span>
+              <span>Popular rated products</span>
+              <b class="promo-action">Explore</b>
             </a>
           </div>
         </div>
@@ -1021,8 +1065,8 @@
       const urls = {
         today: buildTaggedUrl("/deals"),
         blackFriday: buildTaggedUrl("/s", { k: "black friday deals" }),
-        discount: buildTaggedUrl("/s", { k: "today discount deals" }),
-        topRated: buildTaggedUrl("/s", { k: "top rated deals" })
+        discount: buildTaggedUrl("/s", { k: "big discount deals" }),
+        topRated: buildTaggedUrl("/s", { k: "top rated products" })
       };
 
       dealLinks.forEach((link) => {
